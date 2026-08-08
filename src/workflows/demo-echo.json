@@ -1,0 +1,71 @@
+{
+  "name": "Demo: Webhook Echo Greeting",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "demo/echo",
+        "responseMode": "responseNode"
+      },
+      "id": "c5c44391-254e-462e-96b5-f635efbb2e94",
+      "name": "Echo Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $json.body?.name ?? $json.name ?? \"stranger\" }}",
+              "type": "string"
+            },
+            {
+              "id": "greeting",
+              "name": "greeting",
+              "value": "={{ \"Hey there, \" + ($json.body?.name ?? $json.name ?? \"stranger\") + \"!\" }}",
+              "type": "string"
+            },
+            {
+              "id": "receivedAt",
+              "name": "receivedAt",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "4c3fa60c-2421-4be7-aa13-fc9f13ffe54c",
+      "name": "Build Greeting",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem"
+      },
+      "id": "f84f19b0-12c5-415b-8c25-096e615300c2",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [440, 0]
+    }
+  ],
+  "connections": {
+    "Echo Webhook": {
+      "main": [[{ "node": "Build Greeting", "type": "main", "index": 0 }]]
+    },
+    "Build Greeting": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
